@@ -14,4 +14,9 @@ public interface HouseholdMemberRepository
 
     Optional<HouseholdMember> findByUserId(UUID userId);
 
+    Optional<HouseholdMember> findByIdAndHouseholdId(
+            UUID memberId,
+            UUID householdId
+    );
+
 }

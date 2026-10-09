@@ -98,4 +98,8 @@ public class HouseholdMember {
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

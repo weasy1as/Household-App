@@ -91,4 +91,27 @@ public class HouseholdService {
         return HouseholdMemberResponse.from(saved);
     }
 
+    // update member active/inactive
+
+
+    @Transactional
+    public HouseholdMemberResponse updateMemberStatus(
+            UUID householdId,
+            UUID memberId,
+            boolean active
+    ) {
+        HouseholdMember member = householdMemberRepository
+                .findByIdAndHouseholdId(memberId, householdId)
+                .orElseThrow(() ->
+                        new HouseholdMemberNotFoundException(
+                                memberId, householdId));
+
+        member.setActive(active);
+
+        HouseholdMember saved = householdMemberRepository.save(member);
+
+        return HouseholdMemberResponse.from(saved);
+    }
+
+
 }

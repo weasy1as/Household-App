@@ -1,9 +1,6 @@
 package com.household.backend.household;
 
-import com.household.backend.household.dto.AddHouseholdMemberRequest;
-import com.household.backend.household.dto.CreateHouseholdRequest;
-import com.household.backend.household.dto.HouseholdMemberResponse;
-import com.household.backend.household.dto.HouseholdResponse;
+import com.household.backend.household.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,5 +42,22 @@ public class HouseholdController {
                 request.email()
         );
     }
+
+    // update member by active/inactive
+
+
+    @PatchMapping("/{householdId}/members/{memberId}/status")
+    public HouseholdMemberResponse updateMemberStatus(
+            @PathVariable UUID householdId,
+            @PathVariable UUID memberId,
+            @Valid @RequestBody UpdateMemberStatusRequest request
+    ) {
+        return householdService.updateMemberStatus(
+                householdId,
+                memberId,
+                request.active()
+        );
+    }
+
 
 }
