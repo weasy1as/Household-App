@@ -102,4 +102,8 @@ public class HouseholdMember {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
 }

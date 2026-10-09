@@ -4,6 +4,7 @@ package com.household.backend.exception;
 import com.household.backend.auth.UserNotFoundException;
 import com.household.backend.household.HouseholdMemberNotFoundException;
 import com.household.backend.household.HouseholdNotFoundException;
+import com.household.backend.household.InvalidMemberOrderException;
 import com.household.backend.household.UserAlreadyInHouseholdException;
 import com.household.backend.profile.ProfileNotFoundException;
 
@@ -63,5 +64,18 @@ public class GlobalExceptionHandler {
                         "Bad Request",
                         message
                 ));
+    }
+
+    @ExceptionHandler(InvalidMemberOrderException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidMemberOrder(
+            InvalidMemberOrderException exception) {
+
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(
+                        400,
+                        "Bad Request",
+                        exception.getMessage()
+                )
+        );
     }
 }

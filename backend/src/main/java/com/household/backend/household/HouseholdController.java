@@ -4,6 +4,7 @@ import com.household.backend.household.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,8 +45,6 @@ public class HouseholdController {
     }
 
     // update member by active/inactive
-
-
     @PatchMapping("/{householdId}/members/{memberId}/status")
     public HouseholdMemberResponse updateMemberStatus(
             @PathVariable UUID householdId,
@@ -56,6 +55,18 @@ public class HouseholdController {
                 householdId,
                 memberId,
                 request.active()
+        );
+    }
+
+    // reorder members lis
+    @PutMapping("/{householdId}/members/order")
+    public List<HouseholdMemberResponse> reorderMembers(
+            @PathVariable UUID householdId,
+            @Valid @RequestBody ReorderMembersRequest request
+    ) {
+        return householdService.reorderMembers(
+                householdId,
+                request.memberIds()
         );
     }
 

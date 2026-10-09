@@ -7,8 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.household.backend.auth.SupabaseAdminService;
 import com.household.backend.household.dto.HouseholdMemberResponse;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.UUID;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class HouseholdService {
@@ -111,6 +113,73 @@ public class HouseholdService {
         HouseholdMember saved = householdMemberRepository.save(member);
 
         return HouseholdMemberResponse.from(saved);
+    }
+
+    // reorder members list
+
+    @Transactional
+    public List<HouseholdMemberResponse> reorderMembers(
+            UUID householdId,
+            List<UUID> memberIds
+    ) {
+        // Ensure the household exists
+        householdRepository.findById(householdId)
+                .orElseThrow(() ->
+                        new HouseholdNotFoundException(householdId));
+
+        List<HouseholdMember> members =
+                householdMemberRepository
+                        .findByHouseholdIdOrderByPositionAsc(householdId);
+
+        // Reject duplicate IDs
+        if (new HashSet<>(memberIds).size() != memberIds.size()) {
+            throw new InvalidMemberOrderException(
+                    "The member list contains duplicate IDs");
+        }
+
+        // Require every household member exactly once
+        Set<UUID> existingIds = members.stream()
+                .map(HouseholdMember::getId)
+                .collect(Collectors.toSet());
+
+        if (memberIds.size() != members.size()
+                || !existingIds.equals(new HashSet<>(memberIds))) {
+            throw new InvalidMemberOrderException(
+                    "Provide every member of this household exactly once");
+        }
+
+        // Move positions above the current range to avoid unique conflicts
+        int nextPosition = members.stream()
+                .mapToInt(HouseholdMember::getPosition)
+                .max()
+                .orElse(0) + 1;
+
+        for (HouseholdMember member : members) {
+            member.setPosition(nextPosition++);
+        }
+
+        householdMemberRepository.saveAllAndFlush(members);
+
+        // Apply the requested order, starting at position 1
+        Map<UUID, HouseholdMember> membersById = members.stream()
+                .collect(Collectors.toMap(
+                        HouseholdMember::getId,
+                        Function.identity()
+                ));
+
+        List<HouseholdMember> reordered = new ArrayList<>();
+
+        for (int i = 0; i < memberIds.size(); i++) {
+            HouseholdMember member = membersById.get(memberIds.get(i));
+            member.setPosition(i + 1);
+            reordered.add(member);
+        }
+
+        householdMemberRepository.saveAllAndFlush(reordered);
+
+        return reordered.stream()
+                .map(HouseholdMemberResponse::from)
+                .toList();
     }
 
 
