@@ -1,6 +1,10 @@
 package com.household.backend.household;
 import com.household.backend.household.dto.HouseholdMemberResponse;
 import com.household.backend.household.dto.HouseholdResponse;
+import com.household.backend.household.dto.ScheduleDayResponse;
+import com.household.backend.profile.Profile;
+import com.household.backend.profile.ProfileNotFoundException;
+import com.household.backend.profile.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,15 +23,18 @@ public class HouseholdService {
     private final HouseholdRepository householdRepository;
     private final HouseholdMemberRepository householdMemberRepository;
     private final SupabaseAdminService supabaseAdminService;
+    private final ProfileRepository profileRepository;
 
     public HouseholdService(
             HouseholdRepository householdRepository,
             HouseholdMemberRepository householdMemberRepository,
-            SupabaseAdminService supabaseAdminService
+            SupabaseAdminService supabaseAdminService,
+            ProfileRepository profileRepository
     ) {
         this.householdRepository = householdRepository;
         this.householdMemberRepository = householdMemberRepository;
         this.supabaseAdminService = supabaseAdminService;
+        this.profileRepository = profileRepository;
     }
 
     @Transactional
@@ -220,6 +227,90 @@ public class HouseholdService {
                         .map(HouseholdMemberResponse::from)
                         .toList());
     }
+
+    // the ScheduleDay logic
+    @Transactional(readOnly = true)
+    public List<ScheduleDayResponse> getSchedule(
+            UUID householdId,
+            int days
+    ) {
+        if (days < 1 || days > 31) {
+            throw new IllegalArgumentException(
+                    "Days must be between 1 and 31");
+        }
+
+        Household household = householdRepository.findById(householdId)
+                .orElseThrow(() ->
+                        new HouseholdNotFoundException(householdId));
+
+        if (household.getRotationStartDate() == null
+                || household.getRotationStartMemberId() == null) {
+            throw new InvalidRotationSettingsException(
+                    "Rotation settings have not been configured");
+        }
+
+        List<HouseholdMember> activeMembers =
+                householdMemberRepository
+                        .findByHouseholdIdOrderByPositionAsc(householdId)
+                        .stream()
+                        .filter(HouseholdMember::isActive)
+                        .toList();
+
+        if (activeMembers.isEmpty()) {
+            throw new InvalidRotationSettingsException(
+                    "There are no active household members");
+        }
+
+        int startIndex = -1;
+        for (int i = 0; i < activeMembers.size(); i++) {
+            if (activeMembers.get(i).getId()
+                    .equals(household.getRotationStartMemberId())) {
+                startIndex = i;
+                break;
+            }
+        }
+
+        if (startIndex == -1) {
+            throw new InvalidRotationSettingsException(
+                    "The starting member is not active");
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = household.getRotationStartDate();
+
+        List<ScheduleDayResponse> schedule = new ArrayList<>();
+
+        for (int day = 0; day < days; day++) {
+            LocalDate date = today.plusDays(day);
+
+            if (date.isBefore(startDate)) {
+                continue;
+            }
+
+            long daysSinceStart = java.time.temporal.ChronoUnit.DAYS
+                    .between(startDate, date);
+
+            int memberIndex = (int) ((startIndex + daysSinceStart)
+                    % activeMembers.size());
+
+            HouseholdMember member = activeMembers.get(memberIndex);
+
+            Profile profile = profileRepository.findById(member.getUserId())
+                    .orElseThrow(() ->
+                            new ProfileNotFoundException(member.getUserId()));
+
+            schedule.add(new ScheduleDayResponse(
+                    date,
+                    member.getId(),
+                    member.getUserId(),
+                    profile.getDisplayName(),
+                    member.getPosition()
+            ));
+        }
+
+        return schedule;
+    }
+
 
 
 

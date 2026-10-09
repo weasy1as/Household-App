@@ -83,5 +83,15 @@ public class HouseholdController {
         );
     }
 
+    //schedueleDay list
+    @GetMapping("/{householdId}/schedule")
+    public List<ScheduleDayResponse> getSchedule(
+            @PathVariable UUID householdId,
+            @RequestParam(defaultValue = "7") int days
+    ) {
+        return householdService.getSchedule(householdId, days);
+    }
+
+
 
 }
