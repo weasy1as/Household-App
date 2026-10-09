@@ -2,6 +2,8 @@ package com.household.backend.household;
 
 import com.household.backend.household.dto.*;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +21,11 @@ public class HouseholdController {
 
     @PostMapping
     public Household createHousehold(
-            @Valid @RequestBody CreateHouseholdRequest request) {
-
+            @Valid @RequestBody CreateHouseholdRequest request, @AuthenticationPrincipal Jwt jwt) {
+        UUID ownerId = UUID.fromString(jwt.getSubject());
         return householdService.createHousehold(
                 request.name(),
-                java.util.UUID.fromString(request.ownerId())
+                ownerId
         );
     }
 
