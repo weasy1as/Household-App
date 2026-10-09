@@ -8,6 +8,7 @@ import com.household.backend.auth.SupabaseAdminService;
 import com.household.backend.household.dto.HouseholdMemberResponse;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -181,6 +182,45 @@ public class HouseholdService {
                 .map(HouseholdMemberResponse::from)
                 .toList();
     }
+
+    // household rotation logic
+
+    @Transactional
+    public HouseholdResponse updateRotationSettings(
+            UUID householdId,
+            LocalDate startDate,
+            UUID startingMemberId
+    ) {
+        Household household = householdRepository.findById(householdId)
+                .orElseThrow(() ->
+                        new HouseholdNotFoundException(householdId));
+
+        HouseholdMember startingMember = householdMemberRepository
+                .findByIdAndHouseholdId(startingMemberId, householdId)
+                .orElseThrow(() ->
+                        new HouseholdMemberNotFoundException(
+                                startingMemberId, householdId));
+
+        if (!startingMember.isActive()) {
+            throw new InvalidRotationSettingsException(
+                    "The starting member must be active");
+        }
+
+        household.setRotationStartDate(startDate);
+        household.setRotationStartMemberId(startingMemberId);
+
+        Household saved = householdRepository.save(household);
+
+        List<HouseholdMember> members =
+                householdMemberRepository
+                        .findByHouseholdIdOrderByPositionAsc(householdId);
+
+        return HouseholdResponse.from(saved,
+                members.stream()
+                        .map(HouseholdMemberResponse::from)
+                        .toList());
+    }
+
 
 
 }

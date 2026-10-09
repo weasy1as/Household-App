@@ -70,5 +70,18 @@ public class HouseholdController {
         );
     }
 
+    // rotation
+    @PutMapping("/{householdId}/rotation-settings")
+    public HouseholdResponse updateRotationSettings(
+            @PathVariable UUID householdId,
+            @Valid @RequestBody UpdateRotationSettingsRequest request
+    ) {
+        return householdService.updateRotationSettings(
+                householdId,
+                request.startDate(),
+                request.startingMemberId()
+        );
+    }
+
 
 }

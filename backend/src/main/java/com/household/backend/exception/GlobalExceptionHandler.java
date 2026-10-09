@@ -2,10 +2,7 @@
 package com.household.backend.exception;
 
 import com.household.backend.auth.UserNotFoundException;
-import com.household.backend.household.HouseholdMemberNotFoundException;
-import com.household.backend.household.HouseholdNotFoundException;
-import com.household.backend.household.InvalidMemberOrderException;
-import com.household.backend.household.UserAlreadyInHouseholdException;
+import com.household.backend.household.*;
 import com.household.backend.profile.ProfileNotFoundException;
 
 import org.springframework.http.HttpStatus;
@@ -77,5 +74,13 @@ public class GlobalExceptionHandler {
                         exception.getMessage()
                 )
         );
+    }
+
+    @ExceptionHandler(InvalidRotationSettingsException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidRotationSettings(
+            InvalidRotationSettingsException exception) {
+        return ResponseEntity.badRequest().body(
+                ApiErrorResponse.of(
+                        400, "Bad Request", exception.getMessage()));
     }
 }

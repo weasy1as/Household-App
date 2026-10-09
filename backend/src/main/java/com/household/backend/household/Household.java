@@ -64,4 +64,12 @@ public class Household {
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
+
+    public void setRotationStartDate(LocalDate rotationStartDate) {
+        this.rotationStartDate = rotationStartDate;
+    }
+
+    public void setRotationStartMemberId(UUID rotationStartMemberId) {
+        this.rotationStartMemberId = rotationStartMemberId;
+    }
 }
