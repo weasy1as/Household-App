@@ -66,8 +66,7 @@ public class HouseholdService {
         UUID userId = supabaseAdminService.findUserIdByEmail(email);
 
         if (householdMemberRepository.findByUserId(userId).isPresent()) {
-            throw new IllegalArgumentException(
-                    "This user already belongs to a household");
+            throw new UserAlreadyInHouseholdException();
         }
 
         List<HouseholdMember> members =
