@@ -55,6 +55,22 @@ public class HouseholdMember {
     protected HouseholdMember() {
     }
 
+
+    public HouseholdMember(
+            UUID householdId,
+            UUID userId,
+            String role,
+            Integer position,
+            boolean active
+    ) {
+        this.householdId = householdId;
+        this.userId = userId;
+        this.role = role;
+        this.position = position;
+        this.active = active;
+    }
+
+
     public UUID getId() {
         return id;
     }

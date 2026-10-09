@@ -13,5 +13,5 @@ public interface HouseholdMemberRepository
     );
 
     Optional<HouseholdMember> findByUserId(UUID userId);
-    
+
 }
