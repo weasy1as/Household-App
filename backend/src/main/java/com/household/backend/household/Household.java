@@ -25,10 +25,20 @@ public class Household {
     @Column(name = "rotation_start_member_id")
     private UUID rotationStartMemberId;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(
+            name = "created_at",
+            nullable = false,
+            insertable = false,
+            updatable = false
+    )
     private OffsetDateTime createdAt;
 
     protected Household() {
+    }
+
+    public Household(String name, UUID ownerId) {
+        this.name = name;
+        this.ownerId = ownerId;
     }
 
     public UUID getId() {
