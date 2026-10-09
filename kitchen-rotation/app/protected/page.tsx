@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
+import { InfoIcon } from "lucide-react";
+import { Suspense } from "react";
 
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon } from "lucide-react";
+import { backendFetch } from "@/lib/backend";
 import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
-import { Suspense } from "react";
 
 async function UserDetails() {
   const supabase = await createClient();
@@ -13,7 +14,27 @@ async function UserDetails() {
     redirect("/auth/login");
   }
 
-  return JSON.stringify(data.claims, null, 2);
+  return (
+    <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
+      {JSON.stringify(data.claims, null, 2)}
+    </pre>
+  );
+}
+
+async function BackendUserDetails() {
+  const response = await backendFetch("/api/auth/me");
+
+  if (response.status === 401) {
+    return <p>Backend rejected the access token (401).</p>;
+  }
+
+  if (!response.ok) {
+    throw new Error(`Backend returned ${response.status}`);
+  }
+
+  const user = await response.json();
+
+  return <p>Backend authenticated user ID: {user.userId}</p>;
 }
 
 export default function ProtectedPage() {
@@ -23,21 +44,25 @@ export default function ProtectedPage() {
         <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
           <InfoIcon size="16" strokeWidth={2} />
           This is a protected page that you can only see as an authenticated
-          user
+          user.
         </div>
       </div>
+
       <div className="flex flex-col gap-2 items-start">
         <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          <Suspense>
-            <UserDetails />
-          </Suspense>
-        </pre>
+        <Suspense fallback={<p>Loading user details...</p>}>
+          <UserDetails />
+        </Suspense>
       </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
+
+      <div className="flex flex-col gap-2 items-start">
+        <h2 className="font-bold text-2xl mb-4">Spring Boot connection</h2>
+        <Suspense fallback={<p>Connecting to backend...</p>}>
+          <BackendUserDetails />
+        </Suspense>
       </div>
+
+      <FetchDataSteps />
     </div>
   );
 }
