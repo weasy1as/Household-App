@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { CalendarDays, CheckCircle2, Settings2, Users } from "lucide-react";
 import {
   updateRotationSettings,
   type RotationSettingsState,
@@ -37,78 +38,140 @@ export default function RotationSettingsForm({
     .sort((a, b) => a.position - b.position);
 
   return (
-    <section className="rounded-lg border p-5">
-      <h2 className="text-lg font-semibold">Rotation settings</h2>
+    <section className="rounded-3xl border border-[#E7EAE2] bg-white p-5 shadow-[0_2px_12px_rgba(31,45,33,0.025)] sm:p-7">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F0F4EC] text-[#315B40]">
+          <Settings2 size={21} />
+        </div>
 
-      <p className="mt-1 text-sm text-gray-600">
-        Choose when the cooking rotation starts and who cooks first.
-      </p>
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-[#202A22]">
+            Rotation settings
+          </h2>
+
+          <p className="mt-1 text-sm leading-6 text-[#7B847A]">
+            Choose when your rotation begins and who takes the first turn.
+          </p>
+        </div>
+      </div>
 
       {activeMembers.length === 0 ? (
-        <p className="mt-4 text-sm text-gray-600">
-          You need an active household member to configure the rotation.
-        </p>
+        <div className="mt-6 rounded-2xl border border-dashed border-[#DCE3D8] bg-[#FAFBF8] p-5">
+          <Users size={23} className="text-[#879487]" />
+
+          <p className="mt-3 font-semibold text-[#354737]">No active members</p>
+
+          <p className="mt-1 text-sm leading-6 text-[#7B847A]">
+            Activate at least one household member before configuring the
+            rotation.
+          </p>
+        </div>
       ) : (
-        <form action={formAction} className="mt-4 space-y-4">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="startDate" className="text-sm font-medium">
-              Start date
+        <form action={formAction} className="mt-6 space-y-5">
+          <div className="space-y-2">
+            <label
+              htmlFor="startDate"
+              className="block text-sm font-semibold text-[#354737]"
+            >
+              Rotation start date
             </label>
 
-            <input
-              id="startDate"
-              name="startDate"
-              type="date"
-              required
-              defaultValue={rotationStartDate ?? ""}
-              disabled={pending}
-              className="rounded-md border px-3 py-2"
-            />
+            <div className="relative">
+              <CalendarDays
+                size={18}
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7B8B79]"
+              />
+
+              <input
+                id="startDate"
+                name="startDate"
+                type="date"
+                required
+                defaultValue={rotationStartDate?.slice(0, 10) ?? ""}
+                disabled={pending}
+                className="min-h-12 w-full rounded-xl border border-[#DFE5DA] bg-[#FAFBF8] py-3 pl-11 pr-3 text-base text-[#263329] outline-none transition focus:border-[#63866A] focus:ring-4 focus:ring-[#244C3A]/10 disabled:cursor-not-allowed disabled:opacity-60"
+              />
+            </div>
+
+            <p className="text-xs leading-5 text-[#879084]">
+              The first day of your repeating household rotation.
+            </p>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="startingMemberId" className="text-sm font-medium">
-              Starting member
+          <div className="space-y-2">
+            <label
+              htmlFor="startingMemberId"
+              className="block text-sm font-semibold text-[#354737]"
+            >
+              Who goes first?
             </label>
 
-            <select
-              id="startingMemberId"
-              name="startingMemberId"
-              required
-              defaultValue={rotationStartMemberId ?? ""}
-              disabled={pending}
-              className="rounded-md border px-3 py-2"
-            >
-              <option value="" disabled>
-                Choose a member
-              </option>
+            <div className="relative">
+              <Users
+                size={18}
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[#7B8B79]"
+              />
 
-              {activeMembers.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.displayName ?? `Member ${member.position}`}
+              <select
+                id="startingMemberId"
+                name="startingMemberId"
+                required
+                defaultValue={rotationStartMemberId ?? ""}
+                disabled={pending}
+                className="min-h-12 w-full appearance-none rounded-xl border border-[#DFE5DA] bg-[#FAFBF8] py-3 pl-11 pr-10 text-base text-[#263329] outline-none transition focus:border-[#63866A] focus:ring-4 focus:ring-[#244C3A]/10 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value="" disabled>
+                  Choose a household member
                 </option>
-              ))}
-            </select>
+
+                {activeMembers.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.displayName?.trim() || `Member ${member.position}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <p className="text-xs leading-5 text-[#879084]">
+              Only active household members can be selected.
+            </p>
           </div>
 
           {state.error && (
-            <p role="alert" className="text-sm text-red-600">
+            <div
+              role="alert"
+              className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-5 text-red-700"
+            >
               {state.error}
-            </p>
+            </div>
           )}
 
           {state.success && (
-            <p role="status" className="text-sm text-green-700">
-              {state.success}
-            </p>
+            <div
+              role="status"
+              className="flex items-start gap-2 rounded-xl border border-[#D6E5D3] bg-[#F0F5EC] p-3 text-sm leading-5 text-[#315B40]"
+            >
+              <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+              <span>{state.success}</span>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#244C3A] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1B3D2D] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#244C3A]/20 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
-            {pending ? "Saving..." : "Save settings"}
+            {pending ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                Saving settings...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 size={17} />
+                Save rotation
+              </>
+            )}
           </button>
         </form>
       )}
