@@ -59,7 +59,7 @@ public class HouseholdService {
         var members = householdMemberRepository
                 .findByHouseholdIdOrderByPositionAsc(householdId)
                 .stream()
-                .map(HouseholdMemberResponse::from)
+                .map(this::toMemberResponse)
                 .toList();
 
         return HouseholdResponse.from(household, members);
@@ -98,7 +98,7 @@ public class HouseholdService {
 
         HouseholdMember saved = householdMemberRepository.save(member);
 
-        return HouseholdMemberResponse.from(saved);
+        return toMemberResponse(saved);
     }
 
     // update member active/inactive
@@ -120,7 +120,7 @@ public class HouseholdService {
 
         HouseholdMember saved = householdMemberRepository.save(member);
 
-        return HouseholdMemberResponse.from(saved);
+        return toMemberResponse(saved);
     }
 
     // reorder members list
@@ -186,7 +186,7 @@ public class HouseholdService {
         householdMemberRepository.saveAllAndFlush(reordered);
 
         return reordered.stream()
-                .map(HouseholdMemberResponse::from)
+                .map(this::toMemberResponse)
                 .toList();
     }
 
@@ -224,7 +224,7 @@ public class HouseholdService {
 
         return HouseholdResponse.from(saved,
                 members.stream()
-                        .map(HouseholdMemberResponse::from)
+                        .map(this::toMemberResponse)
                         .toList());
     }
 
@@ -318,6 +318,21 @@ public class HouseholdService {
                         householdRepository.findById(member.getHouseholdId())
                 );
     }
+
+
+    private HouseholdMemberResponse toMemberResponse(
+            HouseholdMember member
+    ) {
+        Profile profile = profileRepository.findById(member.getUserId())
+                .orElseThrow(() ->
+                        new ProfileNotFoundException(member.getUserId()));
+
+        return HouseholdMemberResponse.from(
+                member,
+                profile.getDisplayName()
+        );
+    }
+
 
 
 

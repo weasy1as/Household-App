@@ -7,18 +7,21 @@ public record HouseholdMemberResponse(
         UUID id,
         UUID userId,
         String role,
+        String displayName,
         Integer position,
         boolean active
 ) {
     public static HouseholdMemberResponse from(
-            HouseholdMember member) {
+            HouseholdMember member,
+            String displayName
+    ) {
         return new HouseholdMemberResponse(
                 member.getId(),
                 member.getUserId(),
                 member.getRole(),
+                displayName,
                 member.getPosition(),
                 member.isActive()
         );
     }
 }
-

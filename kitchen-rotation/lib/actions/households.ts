@@ -46,3 +46,11 @@ export async function createHousehold(
     };
   }
 }
+
+export async function getHousehold(householdId: string) {
+  const response = await backendFetch(`/api/households/${householdId}`);
+  if (!response.ok) {
+    throw new Error("Failed to load the household.");
+  }
+  return response.json();
+}
