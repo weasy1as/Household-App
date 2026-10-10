@@ -311,6 +311,13 @@ public class HouseholdService {
         return schedule;
     }
 
+    //get household for a user
+    public Optional<Household> getHouseholdForUser(UUID userId) {
+        return householdMemberRepository.findByUserId(userId)
+                .flatMap(member ->
+                        householdRepository.findById(member.getHouseholdId())
+                );
+    }
 
 
 

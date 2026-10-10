@@ -2,11 +2,13 @@ package com.household.backend.household;
 
 import com.household.backend.household.dto.*;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -92,6 +94,20 @@ public class HouseholdController {
             @RequestParam(defaultValue = "7") int days
     ) {
         return householdService.getSchedule(householdId, days);
+    }
+
+    // get my household
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyHousehold(
+            @AuthenticationPrincipal Jwt jwt) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+        return householdService.getHouseholdForUser(userId)
+                .map(household -> ResponseEntity.ok(
+                        Map.of("householdId", household.getId())
+                ))
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
 
