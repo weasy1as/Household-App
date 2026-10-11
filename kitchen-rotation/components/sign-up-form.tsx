@@ -48,7 +48,7 @@ export function SignUpForm({
         },
       });
       if (error) throw error;
-      router.push("/auth/dashboard"); // Redirect to the dashboard page after successful sign-up
+      router.push("/dashboard"); // Redirect to the dashboard page after successful sign-up
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {

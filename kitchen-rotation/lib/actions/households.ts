@@ -1,10 +1,12 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/backend";
 
 export type CreateHouseholdState = {
   error?: string;
   success?: string;
+  redirectTo?: string;
 };
 
 export async function createHousehold(
@@ -38,7 +40,10 @@ export async function createHousehold(
       return { error: "Could not create household. Please try again." };
     }
 
-    return { success: "Household created successfully!" };
+    return {
+      success: "Household created successfully!",
+      redirectTo: "/dashboard",
+    };
   } catch (error) {
     console.error("Household creation request failed:", error);
     return {
