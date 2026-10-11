@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import AddMemberForm from "@/components/household/add-member-form";
 import MembersList from "@/components/household/members-list";
 import RotationSettingsForm from "@/components/household/rotation-settings-form";
@@ -69,6 +71,26 @@ async function MembersContent({ householdId }: { householdId: string }) {
         </header>
 
         {isOwner && <AddMemberForm householdId={householdId} />}
+
+        {isOwner && (
+          <div className="flex flex-col gap-3 rounded-3xl border border-[#E7EAE2] bg-white p-5 shadow-[0_2px_12px_rgba(31,45,33,0.025)] sm:flex-row sm:items-center sm:justify-between sm:p-7">
+            <div>
+              <h2 className="font-semibold text-[#202A22]">
+                Manage members
+              </h2>
+              <p className="mt-1 text-sm text-[#7B847A]">
+                Change the order used by the household rotation.
+              </p>
+            </div>
+            <Link
+              href={`/households/${householdId}/members/reorder`}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#CFE0CA] bg-[#EDF5E9] px-4 py-2.5 text-sm font-semibold text-[#315B40] transition hover:bg-[#E1EEDD] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315B40]"
+            >
+              Reorder rotation
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        )}
 
         <MembersList
           householdId={householdId}
