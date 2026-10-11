@@ -6,10 +6,9 @@ import { usePathname } from "next/navigation";
 
 type BottomNavProps = {
   householdId: string;
-  isOwner: boolean;
 };
 
-export default function BottomNav({ householdId, isOwner }: BottomNavProps) {
+export default function BottomNav({ householdId }: BottomNavProps) {
   const pathname = usePathname();
   const householdPath = `/households/${householdId}`;
 
@@ -25,7 +24,7 @@ export default function BottomNav({ householdId, isOwner }: BottomNavProps) {
       href: `${householdPath}/members`,
       label: "Members",
       icon: Users,
-      isVisible: isOwner,
+      isVisible: true,
       isActive: (path: string) =>
         path === `${householdPath}/members` ||
         path.startsWith(`${householdPath}/members/`),

@@ -76,12 +76,14 @@ async function MembersContent({ householdId }: { householdId: string }) {
           canManageStatus={isOwner}
         />
 
-        <RotationSettingsForm
-          householdId={household.id}
-          members={household.members}
-          rotationStartDate={household.rotationStartDate}
-          rotationStartMemberId={household.rotationStartMemberId}
-        />
+        {isOwner && (
+          <RotationSettingsForm
+            householdId={household.id}
+            members={household.members}
+            rotationStartDate={household.rotationStartDate}
+            rotationStartMemberId={household.rotationStartMemberId}
+          />
+        )}
       </div>
     </main>
   );
