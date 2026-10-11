@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import AddMemberForm from "@/components/household/add-member-form";
 import MembersList from "@/components/household/members-list";
 import RotationSettingsForm from "@/components/household/rotation-settings-form";
 import { getHousehold } from "@/lib/actions/households";
@@ -66,6 +67,8 @@ async function MembersContent({ householdId }: { householdId: string }) {
             {household.members.length === 1 ? "member" : "members"}
           </div>
         </header>
+
+        {isOwner && <AddMemberForm householdId={householdId} />}
 
         <MembersList
           householdId={householdId}
