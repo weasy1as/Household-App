@@ -1,6 +1,6 @@
 "use client";
 
-import { House, Users } from "lucide-react";
+import { House, UserRound, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,6 +30,15 @@ export default function BottomNav({ householdId, isOwner }: BottomNavProps) {
         path === `${householdPath}/members` ||
         path.startsWith(`${householdPath}/members/`),
     },
+    {
+      href: `${householdPath}/profile`,
+      label: "Profile",
+      icon: UserRound,
+      isVisible: true,
+      isActive: (path: string) =>
+        path === `${householdPath}/profile` ||
+        path.startsWith(`${householdPath}/profile/`),
+    },
   ];
 
   const visibleItems = items.filter((item) => item.isVisible);
@@ -42,7 +51,11 @@ export default function BottomNav({ householdId, isOwner }: BottomNavProps) {
       <div className="mx-auto max-w-lg px-4">
         <div
           className={`grid ${
-            visibleItems.length === 1 ? "grid-cols-1" : "grid-cols-2"
+            visibleItems.length === 1
+              ? "grid-cols-1"
+              : visibleItems.length === 2
+                ? "grid-cols-2"
+                : "grid-cols-3"
           } gap-2 py-2`}
         >
           {visibleItems.map(({ href, label, icon: Icon, isActive }) => {
