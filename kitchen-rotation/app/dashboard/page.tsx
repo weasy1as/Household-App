@@ -21,7 +21,17 @@ async function DashboardContent() {
   }
 
   if (!response.ok && response.status !== 204) {
-    throw new Error("Failed to check household membership.");
+    const errorBody = await response.text();
+
+    console.error("Household membership check failed:", {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorBody,
+    });
+
+    throw new Error(
+      `Failed to check household membership: ${response.status} ${response.statusText}`,
+    );
   }
 
   if (response.status === 204) {
