@@ -9,9 +9,7 @@ type Props = {
   params: Promise<{ householdId: string }>;
 };
 
-export default async function HouseholdPage({ params }: Props) {
-  const { householdId } = await params;
-
+export default function HouseholdPage({ params }: Props) {
   return (
     <Suspense
       fallback={
@@ -24,12 +22,14 @@ export default async function HouseholdPage({ params }: Props) {
         </main>
       }
     >
-      <HouseholdContent householdId={householdId} />
+      <HouseholdContent params={params} />
     </Suspense>
   );
 }
 
-async function HouseholdContent({ householdId }: { householdId: string }) {
+async function HouseholdContent({ params }: Props) {
+  const { householdId } = await params;
+
   const [household, schedule] = await Promise.all([
     getHousehold(householdId),
     getCleaningSchedule(householdId, 7),

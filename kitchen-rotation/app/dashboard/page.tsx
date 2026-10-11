@@ -1,14 +1,13 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/backend";
 
-export default async function DashboardPage() {
+async function DashboardContent() {
   let response: Response;
 
   try {
     response = await backendFetch("/api/households/me");
   } catch {
-    // Do not assume the user is signed out just because
-    // the backend could not be reached.
     return (
       <main className="p-6">
         <h1 className="text-xl font-semibold">Unable to load your dashboard</h1>
@@ -36,4 +35,20 @@ export default async function DashboardPage() {
   }
 
   redirect(`/households/${householdId}`);
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="p-6">
+          <p className="text-sm text-muted-foreground">
+            Loading your dashboard...
+          </p>
+        </main>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
+  );
 }

@@ -2,15 +2,14 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/lib/actions/profile";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/logout-button";
+import { Suspense } from "react";
 
 type Props = {
   params: Promise<{ householdId: string }>;
 };
-
-export default async function ProfilePage({ params }: Props) {
-  await params;
-
+async function ProfileContent() {
   const supabase = await createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -56,6 +55,7 @@ export default async function ProfilePage({ params }: Props) {
                 {result.profile.displayName}
               </dd>
             </div>
+
             <div className="flex flex-col gap-1 py-4 last:pb-0 sm:flex-row sm:items-center sm:justify-between">
               <dt className="text-sm font-medium text-[#858D82]">Email</dt>
               <dd className="break-all text-sm font-semibold text-[#202A22]">
@@ -76,5 +76,23 @@ export default async function ProfilePage({ params }: Props) {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#F7F8F4] px-4 py-8 sm:px-6">
+          <div className="mx-auto max-w-3xl animate-pulse space-y-5">
+            <div className="h-48 rounded-3xl bg-[#E5E9E1]" />
+            <div className="h-56 rounded-3xl bg-white" />
+            <div className="h-36 rounded-3xl bg-white" />
+          </div>
+        </main>
+      }
+    >
+      <ProfileContent />
+    </Suspense>
   );
 }
