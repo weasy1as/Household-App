@@ -51,12 +51,6 @@ async function HouseholdContent({ params }: Props) {
         />
 
         <CleaningSchedule schedule={schedule} />
-
-        <footer className="pb-4 pt-1 text-center">
-          <p className="text-xs text-[#8A9288]">
-            A happier home starts with sharing the work.
-          </p>
-        </footer>
       </div>
     </main>
   );

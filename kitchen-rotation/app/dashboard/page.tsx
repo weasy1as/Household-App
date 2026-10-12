@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { backendFetch } from "@/lib/backend";
+import DashboardLoading from "@/components/dashboard/DashboardLoading";
 
 async function DashboardContent() {
   let response: Response;
@@ -49,15 +50,7 @@ async function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <Suspense
-      fallback={
-        <main className="p-6">
-          <p className="text-sm text-muted-foreground">
-            Loading your dashboard...
-          </p>
-        </main>
-      }
-    >
+    <Suspense fallback={<DashboardLoading />}>
       <DashboardContent />
     </Suspense>
   );

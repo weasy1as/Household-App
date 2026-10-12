@@ -66,3 +66,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  100% {
+    transform: translateX(330%);
+  }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 1.6s ease-in-out infinite;
+}
