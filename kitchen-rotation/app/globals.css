@@ -80,3 +80,9 @@
 .animate-loading-bar {
   animation: loading-bar 1.6s ease-in-out infinite;
 }
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
