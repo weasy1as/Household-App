@@ -38,7 +38,7 @@ public class HouseholdController {
         );
     }
 
-    @DeleteMapping
+    @DeleteMapping("{householdId}")
     public ResponseEntity<Void> deleteHousehold(
             @PathVariable UUID householdId,
             @AuthenticationPrincipal Jwt jwt

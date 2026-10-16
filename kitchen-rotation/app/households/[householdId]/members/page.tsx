@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import AddMemberForm from "@/components/household/add-member-form";
+import DeleteHouseholdButton from "@/components/household/delete-household-button";
 import MembersList from "@/components/household/members-list";
 import RotationSettingsForm from "@/components/household/rotation-settings-form";
 import { getHousehold } from "@/lib/actions/households";
@@ -104,6 +105,8 @@ async function MembersContent({ householdId }: { householdId: string }) {
             rotationStartMemberId={household.rotationStartMemberId}
           />
         )}
+
+        {isOwner && <DeleteHouseholdButton householdId={householdId} />}
       </div>
     </main>
   );

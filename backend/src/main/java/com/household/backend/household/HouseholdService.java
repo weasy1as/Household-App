@@ -56,6 +56,8 @@ public class HouseholdService {
         Household household = householdRepository.findById(householdId)
                 .orElseThrow(() ->
                         new HouseholdNotFoundException(householdId));
+        household.setRotationStartMemberId(null);
+        household.setRotationStartDate(null);
 
         householdRepository.deleteById(householdId);
     }
