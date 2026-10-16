@@ -1,6 +1,8 @@
 # Kitchen Rotation
 
 Kitchen Rotation is a full-stack web application I developed to solve a practical problem in my own home: organizing a shared kitchen cleaning schedule. It allows households to manage members, customize the cleaning rotation, and automatically generate a schedule.
+
+This is a mobile-first web application designed primarily for mobile devices and intended to be installable as a Progressive Web App (PWA).
 ## Tech Stack
 
 - **Frontend:** Next.js, React, TypeScript
