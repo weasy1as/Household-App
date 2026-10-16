@@ -1,4 +1,5 @@
 import { ShieldCheck, Users, UserRound } from "lucide-react";
+import MemberDeleteButton from "@/components/household/member-delete-button";
 import MemberStatusButton from "@/components/household/member-status-button";
 
 export type Member = {
@@ -126,11 +127,15 @@ export default function MembersList({
                 </div>
 
                 {canManageStatus && (
-                  <div className="shrink-0">
+                  <div className="flex shrink-0 items-start gap-2">
                     <MemberStatusButton
                       householdId={householdId}
                       memberId={member.id}
                       active={member.active}
+                    />
+                    <MemberDeleteButton
+                      householdId={householdId}
+                      memberId={member.id}
                     />
                   </div>
                 )}
