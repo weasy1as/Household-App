@@ -4,6 +4,7 @@ import HouseholdHeader from "@/components/household/household-header";
 import ResponsibilitySummary from "@/components/household/responsibility-summary";
 import { getCleaningSchedule } from "@/lib/actions/cleaning-schedule";
 import { getHousehold } from "@/lib/actions/households";
+import { createClient } from "@/lib/supabase/server";
 
 type Props = {
   params: Promise<{ householdId: string }>;
@@ -34,6 +35,10 @@ async function HouseholdContent({ params }: Props) {
     getHousehold(householdId),
     getCleaningSchedule(householdId, 7),
   ]);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <main className="min-h-screen bg-[#F7F8F4] px-4 py-5 text-[#202A22] sm:px-6 sm:py-8">
@@ -48,9 +53,10 @@ async function HouseholdContent({ params }: Props) {
           members={household.members}
           rotationStartDate={household.rotationStartDate}
           rotationStartMemberId={household.rotationStartMemberId}
+          currentUserId={user?.id}
         />
 
-        <CleaningSchedule schedule={schedule} />
+        <CleaningSchedule schedule={schedule} currentUserId={user?.id} />
       </div>
     </main>
   );

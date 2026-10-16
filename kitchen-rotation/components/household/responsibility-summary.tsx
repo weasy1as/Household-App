@@ -2,6 +2,7 @@ import { CalendarDays, CheckCircle2, CircleHelp } from "lucide-react";
 
 type Member = {
   id: string;
+  userId: string;
   displayName?: string;
   position: number;
   active: boolean;
@@ -11,6 +12,7 @@ type ResponsibilitySummaryProps = {
   members: Member[];
   rotationStartDate: string | null;
   rotationStartMemberId: string | null;
+  currentUserId?: string;
 };
 
 type Responsibility = {
@@ -94,6 +96,7 @@ export default function ResponsibilitySummary({
   members,
   rotationStartDate,
   rotationStartMemberId,
+  currentUserId,
 }: ResponsibilitySummaryProps) {
   const today = new Date();
 
@@ -115,6 +118,9 @@ export default function ResponsibilitySummary({
 
   const todayResponsibility = responsibilities[1];
 
+  const isCurrentUserToday =
+    todayResponsibility.member?.userId === currentUserId;
+
   const rotationConfigured =
     Boolean(rotationStartDate) && Boolean(rotationStartMemberId);
 
@@ -134,7 +140,7 @@ export default function ResponsibilitySummary({
             Kitchen responsibility
           </h2>
           <p className="mt-1 text-sm text-[#7B847A]">
-            Who's taking care of things?
+            Who&apos;s taking care of things?
           </p>
         </div>
       </div>
@@ -157,46 +163,81 @@ export default function ResponsibilitySummary({
       {/* Three-column schedule */}
       <div className="grid grid-cols-[0.85fr_1.3fr_0.85fr] items-stretch gap-2 sm:gap-3">
         {/* Yesterday */}
-        {[responsibilities[0]].map(({ label, date, member }) => (
-          <div
-            key={label}
-            className="flex min-w-0 flex-col items-center rounded-2xl border border-[#E9ECE5] bg-[#FAFBF8] px-1.5 py-4 text-center sm:px-3 sm:py-5"
-          >
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#849083] sm:text-xs">
-              Yesterday
-            </span>
+        {[responsibilities[0]].map(({ label, date, member }) => {
+          const isCurrentUser = member?.userId === currentUserId;
 
-            <span className="mt-1 text-xs text-[#7B847A] sm:text-sm">
-              {date.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
+          return (
+            <div
+              key={label}
+              className={`flex min-w-0 flex-col items-center rounded-2xl border px-1.5 py-4 text-center sm:px-3 sm:py-5 ${
+                isCurrentUser
+                  ? "border-[#A9C9A5] bg-[#EAF4E8]"
+                  : "border-[#E9ECE5] bg-[#FAFBF8]"
+              }`}
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#849083] sm:text-xs">
+                Yesterday
+              </span>
 
-            <div className="mt-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E8EFE5] text-xs font-semibold text-[#315B40] sm:h-11 sm:w-11 sm:text-sm">
-              {member ? getInitials(getMemberName(member)) : "—"}
+              <span className="mt-1 text-xs text-[#7B847A] sm:text-sm">
+                {date.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+
+              <div className="mt-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#D3E9D0] text-xs font-semibold text-[#315B40] sm:h-11 sm:w-11 sm:text-sm">
+                {member ? getInitials(getMemberName(member)) : "—"}
+              </div>
+
+              <p className="mt-3 w-full break-words text-xs font-semibold leading-5 text-[#263329] sm:text-sm">
+                {member ? getMemberName(member) : "Unassigned"}
+              </p>
+
+              {isCurrentUser && (
+                <span className="mt-1 rounded-full bg-[#D3E9D0] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#315B40]">
+                  Your turn
+                </span>
+              )}
             </div>
+          );
+        })}
 
-            <p className="mt-3 w-full break-words text-xs font-semibold leading-5 text-[#263329] sm:text-sm">
-              {member ? getMemberName(member) : "Unassigned"}
-            </p>
-          </div>
-        ))}
-
-        {/* Today — emphasized center card */}
-        <div className="relative flex min-w-0 flex-col items-center overflow-hidden rounded-2xl bg-[#244C3A] px-2 py-5 text-center text-white shadow-[0_6px_18px_rgba(36,76,58,0.18)] sm:px-4 sm:py-6">
+        {/* Today — highlighted center card */}
+        <div
+          className={`relative flex min-w-0 flex-col items-center overflow-hidden rounded-2xl border px-2 py-5 text-center text-white shadow-[0_6px_18px_rgba(36,76,58,0.18)] sm:px-4 sm:py-6 ${
+            isCurrentUserToday
+              ? "border-[#D4AF37] bg-[#244C3A] ring-1 ring-[#D4AF37]/30"
+              : "border-transparent bg-[#244C3A]"
+          }`}
+        >
+          {/* Decorative circle */}
           <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full border border-white/[0.10]" />
 
-          <div className="relative flex items-center gap-1.5 rounded-full bg-white/15 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-[#E4F0E3] sm:text-[10px]">
+          {/* Today badge */}
+          <div
+            className={`relative flex items-center gap-1.5 rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wider sm:text-[10px] ${
+              isCurrentUserToday
+                ? "bg-[#D4AF37] text-[#244C3A]"
+                : "bg-white/15 text-[#E4F0E3]"
+            }`}
+          >
             <CheckCircle2 size={12} />
-            Today
+            {isCurrentUserToday ? "Your turn" : "Today"}
           </div>
 
           <span className="relative mt-2 text-xs text-[#D4E4D4] sm:text-sm">
-            {formatDate(responsibilities[1].date)}
+            {formatDate(todayResponsibility.date)}
           </span>
 
-          <div className="relative mt-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-sm font-semibold text-white sm:h-16 sm:w-16 sm:text-lg">
+          {/* Member avatar */}
+          <div
+            className={`relative mt-4 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-sm font-semibold sm:h-16 sm:w-16 sm:text-lg ${
+              isCurrentUserToday
+                ? "border-[#D4AF37]/50 bg-white/10 text-[#F2D675]"
+                : "border-white/20 bg-white/10 text-white"
+            }`}
+          >
             {todayResponsibility.member ? (
               getInitials(getMemberName(todayResponsibility.member))
             ) : (
@@ -204,43 +245,69 @@ export default function ResponsibilitySummary({
             )}
           </div>
 
+          {/* Member name */}
           <p className="relative mt-3 w-full break-words text-sm font-bold leading-5 sm:text-base">
             {todayResponsibility.member
               ? getMemberName(todayResponsibility.member)
               : "Unassigned"}
           </p>
 
-          <p className="relative mt-2 text-[10px] leading-4 text-[#D4E4D4] sm:text-xs">
-            {todayResponsibility.member ? "On duty" : "No assignment yet"}
+          {/* Assignment status */}
+          <p
+            className={`relative mt-2 text-[10px] leading-4 sm:text-xs ${
+              isCurrentUserToday
+                ? "font-semibold text-[#F2D675]"
+                : "text-[#D4E4D4]"
+            }`}
+          >
+            {isCurrentUserToday
+              ? "You're responsible today"
+              : todayResponsibility.member
+                ? "On duty"
+                : "No assignment yet"}
           </p>
         </div>
 
         {/* Tomorrow */}
-        {[responsibilities[2]].map(({ label, date, member }) => (
-          <div
-            key={label}
-            className="flex min-w-0 flex-col items-center rounded-2xl border border-[#E9ECE5] bg-[#FAFBF8] px-1.5 py-4 text-center sm:px-3 sm:py-5"
-          >
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#849083] sm:text-xs">
-              Tomorrow
-            </span>
+        {[responsibilities[2]].map(({ label, date, member }) => {
+          const isCurrentUser = member?.userId === currentUserId;
 
-            <span className="mt-1 text-xs text-[#7B847A] sm:text-sm">
-              {date.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
+          return (
+            <div
+              key={label}
+              className={`flex min-w-0 flex-col items-center rounded-2xl border px-1.5 py-4 text-center sm:px-3 sm:py-5 ${
+                isCurrentUser
+                  ? "border-[#A9C9A5] bg-[#EAF4E8]"
+                  : "border-[#E9ECE5] bg-[#FAFBF8]"
+              }`}
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#849083] sm:text-xs">
+                Tomorrow
+              </span>
 
-            <div className="mt-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E8EFE5] text-xs font-semibold text-[#315B40] sm:h-11 sm:w-11 sm:text-sm">
-              {member ? getInitials(getMemberName(member)) : "—"}
+              <span className="mt-1 text-xs text-[#7B847A] sm:text-sm">
+                {date.toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+
+              <div className="mt-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E8EFE5] text-xs font-semibold text-[#315B40] sm:h-11 sm:w-11 sm:text-sm">
+                {member ? getInitials(getMemberName(member)) : "—"}
+              </div>
+
+              <p className="mt-3 w-full break-words text-xs font-semibold leading-5 text-[#263329] sm:text-sm">
+                {member ? getMemberName(member) : "Unassigned"}
+              </p>
+
+              {isCurrentUser && (
+                <span className="mt-1 rounded-full bg-[#D3E9D0] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#315B40]">
+                  Your turn
+                </span>
+              )}
             </div>
-
-            <p className="mt-3 w-full break-words text-xs font-semibold leading-5 text-[#263329] sm:text-sm">
-              {member ? getMemberName(member) : "Unassigned"}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Footer */}

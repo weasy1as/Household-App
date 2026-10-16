@@ -10,6 +10,7 @@ type CleaningDay = {
 
 type CleaningScheduleProps = {
   schedule: CleaningDay[];
+  currentUserId?: string;
 };
 
 function parseDate(date: string) {
@@ -46,7 +47,10 @@ function isToday(date: string) {
   );
 }
 
-export default function CleaningSchedule({ schedule }: CleaningScheduleProps) {
+export default function CleaningSchedule({
+  schedule,
+  currentUserId,
+}: CleaningScheduleProps) {
   return (
     <section className="overflow-hidden rounded-3xl border border-[#E7EAE2] bg-white shadow-[0_2px_12px_rgba(31,45,33,0.025)]">
       <div className="flex items-start justify-between gap-3 p-5 sm:p-7">
@@ -97,12 +101,15 @@ export default function CleaningSchedule({ schedule }: CleaningScheduleProps) {
           <ul className="space-y-1">
             {schedule.map((day) => {
               const today = isToday(day.date);
+              const isCurrentUser = day.userId === currentUserId;
 
               return (
                 <li
                   key={day.date}
                   className={`flex items-center gap-3 rounded-2xl p-3 transition-colors sm:gap-4 sm:p-4 ${
-                    today
+                    isCurrentUser
+                      ? "border border-[#A9C9A5] bg-[#EAF4E8]"
+                      : today
                       ? "border border-[#D6E5D3] bg-[#F0F5EC]"
                       : "border border-transparent hover:bg-[#F8F9F6]"
                   }`}
@@ -128,9 +135,22 @@ export default function CleaningSchedule({ schedule }: CleaningScheduleProps) {
                     <p className="break-words text-sm font-semibold text-[#263329] sm:text-base">
                       {formatDate(day.date)}
                     </p>
-                    <p className="mt-1 truncate text-sm text-[#7B847A]">
-                      {day.displayName}
-                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
+                      <p
+                        className={`truncate text-sm ${
+                          isCurrentUser
+                            ? "font-semibold text-[#315B40]"
+                            : "text-[#7B847A]"
+                        }`}
+                      >
+                        {day.displayName}
+                      </p>
+                      {isCurrentUser && (
+                        <span className="inline-flex shrink-0 items-center rounded-full bg-[#D3E9D0] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#315B40]">
+                          Your turn
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex shrink-0 items-center gap-2">
@@ -144,7 +164,9 @@ export default function CleaningSchedule({ schedule }: CleaningScheduleProps) {
                     <div
                       aria-label={`Member ${day.position}`}
                       className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold ${
-                        today
+                        isCurrentUser
+                          ? "bg-[#CFE5CB] text-[#315B40]"
+                          : today
                           ? "bg-[#D6E5D3] text-[#244C3A]"
                           : "bg-[#EEF0EA] text-[#687367]"
                       }`}
