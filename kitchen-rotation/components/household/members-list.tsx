@@ -1,4 +1,5 @@
 import { ShieldCheck, Users, UserRound } from "lucide-react";
+import MemberDeleteButton from "@/components/household/member-delete-button";
 import MemberStatusButton from "@/components/household/member-status-button";
 
 export type Member = {
@@ -77,7 +78,7 @@ export default function MembersList({
             return (
               <li
                 key={member.id}
-                className="flex min-w-0 items-center gap-3 rounded-2xl border border-transparent p-3 transition-colors hover:border-[#E9ECE5] hover:bg-[#FAFBF8] sm:gap-4 sm:p-4"
+                className="flex min-w-0 flex-wrap items-start gap-3 rounded-2xl border border-transparent p-3 transition-colors hover:border-[#E9ECE5] hover:bg-[#FAFBF8] sm:flex-nowrap sm:items-center sm:gap-4 sm:p-4"
               >
                 <div
                   className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold ${
@@ -89,9 +90,9 @@ export default function MembersList({
                   {getInitials(name)}
                 </div>
 
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 basis-[calc(100%-3.75rem)] sm:basis-auto">
                   <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <p className="max-w-full truncate text-sm font-semibold text-[#263329] sm:text-base">
+                    <p className="min-w-0 break-words text-sm font-semibold text-[#263329] sm:text-base">
                       {name}
                     </p>
 
@@ -126,12 +127,18 @@ export default function MembersList({
                 </div>
 
                 {canManageStatus && (
-                  <div className="shrink-0">
+                  <div className="flex w-full shrink-0 justify-end gap-2 border-t border-[#EEF0EB] pt-3 sm:w-auto sm:border-t-0 sm:pt-0">
                     <MemberStatusButton
                       householdId={householdId}
                       memberId={member.id}
                       active={member.active}
                     />
+                    {member.role !== "owner" && (
+                      <MemberDeleteButton
+                        householdId={householdId}
+                        memberId={member.id}
+                      />
+                    )}
                   </div>
                 )}
               </li>

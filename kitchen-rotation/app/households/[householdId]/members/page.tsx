@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import AddMemberForm from "@/components/household/add-member-form";
+import DeleteHouseholdButton from "@/components/household/delete-household-button";
 import MembersList from "@/components/household/members-list";
 import RotationSettingsForm from "@/components/household/rotation-settings-form";
 import { getHousehold } from "@/lib/actions/households";
@@ -75,9 +76,7 @@ async function MembersContent({ householdId }: { householdId: string }) {
         {isOwner && (
           <div className="flex flex-col gap-3 rounded-3xl border border-[#E7EAE2] bg-white p-5 shadow-[0_2px_12px_rgba(31,45,33,0.025)] sm:flex-row sm:items-center sm:justify-between sm:p-7">
             <div>
-              <h2 className="font-semibold text-[#202A22]">
-                Manage members
-              </h2>
+              <h2 className="font-semibold text-[#202A22]">Manage members</h2>
               <p className="mt-1 text-sm text-[#7B847A]">
                 Change the order used by the household rotation.
               </p>
@@ -106,6 +105,8 @@ async function MembersContent({ householdId }: { householdId: string }) {
             rotationStartMemberId={household.rotationStartMemberId}
           />
         )}
+
+        {isOwner && <DeleteHouseholdButton householdId={householdId} />}
       </div>
     </main>
   );

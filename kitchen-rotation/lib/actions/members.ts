@@ -8,6 +8,11 @@ export type AddMemberState = {
   success?: string;
 };
 
+export type DeleteMemberState = {
+  error?: string;
+  success?: string;
+};
+
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function addHouseholdMember(
@@ -66,4 +71,44 @@ export async function addHouseholdMember(
   revalidatePath(`/households/${householdId}/members`);
 
   return { success: "Member added successfully." };
+}
+
+export async function deleteHouseholdMember(
+  householdId: string,
+  memberId: string,
+  _previousState: DeleteMemberState,
+): Promise<DeleteMemberState> {
+  let response: Response;
+
+  try {
+    response = await backendFetch(
+      `/api/households/${householdId}/members/${memberId}`,
+      {
+        method: "DELETE",
+      },
+    );
+  } catch (error) {
+    console.error("Deleting household member request failed:", error);
+    return {
+      error: "Could not connect to the backend. Please try again.",
+    };
+  }
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      return { error: "Please sign in again." };
+    }
+
+    if (response.status === 404) {
+      return { error: "Household member not found." };
+    }
+
+    console.error("Deleting household member failed:", response.status);
+    return { error: "Could not delete household member. Please try again." };
+  }
+
+  revalidatePath(`/households/${householdId}`);
+  revalidatePath(`/households/${householdId}/members`);
+
+  return { success: "Member deleted successfully." };
 }
