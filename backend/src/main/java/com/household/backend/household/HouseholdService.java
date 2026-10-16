@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.household.backend.auth.SupabaseAdminService;
 import com.household.backend.household.dto.HouseholdMemberResponse;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -48,6 +49,15 @@ public class HouseholdService {
 
         Household household = new Household(name,ownerId);
         return householdRepository.save(household);
+    }
+
+    @Transactional
+    public void deleteHousehold(UUID householdId){
+        Household household = householdRepository.findById(householdId)
+                .orElseThrow(() ->
+                        new HouseholdNotFoundException(householdId));
+
+        householdRepository.deleteById(householdId);
     }
 
     @Transactional(readOnly = true)
@@ -99,6 +109,22 @@ public class HouseholdService {
         HouseholdMember saved = householdMemberRepository.save(member);
 
         return toMemberResponse(saved);
+    }
+
+    //Delete member from household
+
+    @Transactional
+    public void deleteHouseholdMember(UUID memberId, UUID householdId){
+        HouseholdMember householdMember =
+                householdMemberRepository
+                        .findByIdAndHouseholdId(memberId, householdId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Household member not found"
+                                )
+                        );
+
+        householdMemberRepository.deleteById(memberId);
     }
 
     // update member active/inactive
